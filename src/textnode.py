@@ -12,7 +12,7 @@ class TextType(Enum):
 class TextNode(object):
 	"""TextNode class. It represents the different kinds of text blocks"""
 	def __init__(self, text: str, text_type: TextType, url: str | None = None):
-		super(TextNode, self).__init__()
+		super().__init__()
 		self.text = text
 		self.text_type = text_type
 		self.url = url
@@ -27,4 +27,5 @@ class TextNode(object):
 			)
 
 	def __repr__(self) -> str:
+		"""Gives the TextNode textual representation"""
 		return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
