@@ -1,2 +1,2 @@
 # static_site_generator
-Static Webpage Generator in Python 
+Static Webpage Generator written in Python. Boot.dev project
