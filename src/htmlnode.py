@@ -75,4 +75,21 @@ class LeafNode(HTMLNode):
 		props_str: str = "*" if self.props is None else self.props_to_html()
 		return f"LeafNode({tag_str},{self.value},{props_str})"
 
+
+class ParentNode(HTMLNode):
+	"""LeafNode: subclass of HTMLNode representing a leaf tag"""
+	def __init__(self, tag: str, children: list["HTMLNode"], props: dict[str,str] | None = None) -> None:
+		super().__init__(tag,None,children,props)
+
+	def to_html(self) -> str:
+		if self.tag is None:
+			raise ValueError("LeafNode.tag can't be None")
+		if self.children is None:
+			raise ValueError("LeafNode.children can't be None")
+		if len(self.children) == 0:
+			raise ValueError("LeafNode.children can't be empty")
 		
+		html_str = f"<{self.tag}{self.props_to_html()}>"
+		for child in self.children:
+			html_str += child.to_html()
+		return html_str + f"</{self.tag}>"
