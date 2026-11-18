@@ -11,8 +11,8 @@ class HTMLNode(object):
 	def __init__(self, 
 					tag: str | None = None,  				# Kind of tag: p,h1,a,...
 					value: str | None = None, 				# The value of/inside the tag
-					children: list["HTMLNode"] = [], # The children nodes	
-					props: dict[str,str] | None = None):	# Tag's poperties
+					children: list["HTMLNode"] = None, # The children nodes	
+					props: dict[str,str] | None = None) -> None:	# Tag's poperties
 		super().__init__()
 		self.tag = tag
 		self.value = value
@@ -22,7 +22,7 @@ class HTMLNode(object):
 
 	def to_html(self) -> str:
 		"""Turn a HTMLNode object into a formatted string contining the corresponding HTML code"""
-		raise NotImplementedError
+		raise NotImplementedError("to_html method not implemented")
 
 	def props_to_html(self) -> str:
 		"""Turn the `prop` dictionary into a formatted string representing the HTML attributes for the node"""
@@ -42,6 +42,9 @@ class HTMLNode(object):
 		value_str: str = "*" if self.value is None else self.value
 		props_str: str = "*" if self.props is None else self.props_to_html()
 		repr_str: str = f"HTMLNode({tag_str},{value_str},{props_str})"
+		if self.children is None:
+			return repr_str
+				
 		for c in self.children:
 			c_strs: list[str] = repr(c).split("\n")
 			for c_str in c_strs:
@@ -49,5 +52,27 @@ class HTMLNode(object):
 		return repr_str
 
 
+
+class LeafNode(HTMLNode):
+	"""LeafNode: subclass of HTMLNode representing a leaf tag"""
+	def __init__(self, tag: str | None, value: str, props: dict[str,str] | None = None) -> None:
+		super().__init__(tag,value,None,props)
+
+	def to_html(self) -> str:
+		if self.value is None:
+			raise ValueError("LeafNode.value can't be None")
+		if self.tag is None:
+			return self.value
+		html_str = f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+		return html_str
+
+	def __repr__(self) -> str:
+		"""Gives the LeafNode textual representation:
+			LeafNode(tag,value,props_to_html)
+			if tag or props are None use * instead
+		"""
+		tag_str: str = "*" if self.tag is None else self.tag
+		props_str: str = "*" if self.props is None else self.props_to_html()
+		return f"LeafNode({tag_str},{self.value},{props_str})"
 
 		
