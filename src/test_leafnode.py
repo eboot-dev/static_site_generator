@@ -29,6 +29,7 @@ class TestLeafNode(unittest.TestCase):
 		node = LeafNode("p","Hello, world!")
 		self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
 
-
+if __name__ == "__main__":
+    unittest.main()
 
 
