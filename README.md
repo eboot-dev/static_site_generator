@@ -1,7 +1,6 @@
 # static_site_generator
 Static Webpage Generator written in Python. Boot.dev project
 
-
 ## Architecture
 
 High-level architecture for our static site generator (**SSG**).
@@ -17,7 +16,22 @@ The flow of data through the full system is:
 2. The static site generator (the Python code in `src/`) reads the Markdown files and the template file.
 3. The generator converts the Markdown files to a final HTML file for each page and writes them to the `/public` directory.
 
+## Usage
+To run the static site generator inside the project's root directory run:
+```console
+$ ./main.sh
+```
+
 ## Testing
+
+### Run Unit Tests
+To run the unit tests inside the project's root directory run:
+```console
+$ ./test.sh
+```
+
+### Test generated page
+To test the generated page:
 
 1. Inside the `public/` directory start the built-in Python HTTP server (e.g. `python3.10 -m http.server 8888`) to serve the contents of the `/public` directory on [http://localhost:8888](http://localhost:8888) (the local machine). 
 2. Open a browser and navigate to [http://localhost:8888](http://localhost:8888) to view the rendered site.
