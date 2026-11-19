@@ -28,7 +28,8 @@ class HTMLNode(object):
 		"""Turn the `prop` dictionary into a formatted string representing the HTML attributes for the node"""
 		if self.props is None:
 			return ""
-		return " " + " ".join([ f"{key}=\"{self.props[key]}\"" for key in self.props ])
+
+		return " " + " ".join([ f"{k}=\"{v}\"" for k, v in sorted(self.props.items(), key=lambda item: item[0])])
 
 	def __repr__(self) -> str:
 		"""Gives the HTMLNode textual representation:
@@ -78,7 +79,7 @@ class LeafNode(HTMLNode):
 
 class ParentNode(HTMLNode):
 	"""LeafNode: subclass of HTMLNode representing a leaf tag"""
-	def __init__(self, tag: str, children: list["HTMLNode"], props: dict[str,str] | None = None) -> None:
+	def __init__(self, tag: str, children: list[HTMLNode], props: dict[str,str] | None = None) -> None:
 		super().__init__(tag,None,children,props)
 
 	def to_html(self) -> str:
@@ -93,3 +94,4 @@ class ParentNode(HTMLNode):
 		for child in self.children:
 			html_str += child.to_html()
 		return html_str + f"</{self.tag}>"
+
