@@ -52,3 +52,5 @@ The vast majority of our coding happens in the `src/` directory because almost a
 5. Use a recursive **`to_html()`** method to convert the `HTMLNode` and all its nested nodes to a giant HTML string and inject it in the HTML template.
 6. **Write** the full HTML string to a file for that page in the `/public` directory.
 
+## TODO
+- Add support for nested inline elements, e.g. "*this is an italic and **bold** *" 
