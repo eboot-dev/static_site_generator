@@ -45,10 +45,17 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 		case TextType.CODE:
 			html_node = LeafNode("code",text_node.text)
 		case TextType.LINK:
+			if text_node.url is None:
+            	raise ValueError("Invalid URL")
+            if text_node.url == "":
+            	raise ValueError("Empty URL")
 			html_node = LeafNode("a",text_node.text,props={"href":text_node.url})
 		case TextType.IMAGE:
+			if text_node.url is None:
+            	raise ValueError("Invalid URL")
+            if text_node.url == "":
+            	raise ValueError("Empty URL")
 			html_node = LeafNode("img","",props={"alt":text_node.text,"src":text_node.url})
 		case _:
-			raise ValueError("Invalid TextType")
-
+			raise ValueError(f"Invalid TextType: {text_node.text_type}")
 	return html_node
