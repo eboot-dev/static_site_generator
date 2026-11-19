@@ -64,7 +64,40 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
 	
 	return new_nodes
 
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
+	"""
+		It takes a list of "old nodes", a delimiter with a matching TextNode type. It returns a new  
+		list of nodes, where any "text" type nodes in the input list are (potentially) split into 
+		multiple ones interleaved by nodes of the input-specified type. 
+		Non "text" type nodes in the `old_nodes` list are returned as they are.
+	"""
+	new_nodes: list[TextNode] = []
+	for node in old_nodes:
+		if node.text_type != TextType.TEXT:
+			new_nodes.append(node)
+			continue
+		parts = node.text.split(delimiter)
+		if (len(parts) - 1) % 2 == 1:
+			raise ValueError("Invalid Markdown: unmatched formatting delimiters")
+		cnt: int = 0
+		for part in parts:
+			if cnt % 2 == 0:
+				# even blocks are text nodes
+				if part != "":
+					new_nodes.append(TextNode(part,TextType.TEXT))
+			else:
+				# odd blocks are text_type nodes
+				if part == "":
+					raise ValueError("Invalid Markdown: empty formatted section")
+				new_nodes.append(TextNode(part,text_type))
+			cnt +=1
 
+	return new_nodes
+
+
+
+
+	
 
 
 
