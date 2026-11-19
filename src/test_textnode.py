@@ -44,6 +44,8 @@ class TestTextNode(unittest.TestCase):
 		node2 = TextNode("This is a link node", TextType.LINK)
 		self.assertNotEqual(node, node2)
 
+
+class TestTextNodeToHtmlNode(unittest.TestCase):
 	def test_text_to_html(self):
 		node = TextNode("This is a text node", TextType.TEXT)
 		html_node = text_node_to_html_node(node)
