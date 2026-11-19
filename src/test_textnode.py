@@ -1,5 +1,5 @@
 import unittest
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import TextNode, TextType, text_node_to_html_node, split_nodes_delimiter
 
 class TestTextNode(unittest.TestCase):
 	"""Unit Tests for TextNode"""
@@ -46,6 +46,7 @@ class TestTextNode(unittest.TestCase):
 
 
 class TestTextNodeToHtmlNode(unittest.TestCase):
+
 	def test_text_to_html(self):
 		node = TextNode("This is a text node", TextType.TEXT)
 		html_node = text_node_to_html_node(node)
@@ -96,6 +97,62 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 		with self.assertRaises(ValueError):
 			html_node = text_node_to_html_node(node)
 			
+class TestSplitNodesDelimiter(unittest.TestCase):
+	def test_split_code(self):
+		node = TextNode("This is a `code` node", TextType.TEXT)
+		expected = [ 
+			TextNode("This is a ", TextType.TEXT),
+			TextNode("code", TextType.CODE),
+			TextNode(" node", TextType.TEXT)
+		]
+		observed = split_nodes_delimiter([node], "`", TextType.CODE)
+		self.assertEqual(observed, expected)
+
+	def test_split_bold(self):
+		node = TextNode("This is a **bold** node", TextType.TEXT)
+		expected = [ 
+			TextNode("This is a ", TextType.TEXT),
+			TextNode("bold", TextType.BOLD),
+			TextNode(" node", TextType.TEXT)
+		]
+		observed = split_nodes_delimiter([node], "**", TextType.BOLD)
+		self.assertEqual(observed, expected)
+
+	def test_split_italics(self):
+		node = TextNode("This is a *italics* node", TextType.TEXT)
+		expected = [ 
+			TextNode("This is a ", TextType.TEXT),
+			TextNode("italics", TextType.ITALIC),
+			TextNode(" node", TextType.TEXT)
+		]
+		observed = split_nodes_delimiter([node], "*", TextType.ITALIC)
+		self.assertEqual(observed, expected)
+
+	def test_split_single(self):
+		node = TextNode("`This is a single code node`", TextType.TEXT)
+		expected = [ 
+			TextNode("This is a single code node", TextType.CODE)
+		]
+		observed = split_nodes_delimiter([node], "`", TextType.CODE)
+		self.assertEqual(observed, expected)
+
+	def test_split_nothing_found(self):
+		node = TextNode("This is just a text node", TextType.TEXT)
+		expected = [ 
+			node
+		]
+		observed = split_nodes_delimiter([node], "`", TextType.CODE)
+		self.assertEqual(observed, expected)
+
+	def test_split_bad_node(self):
+		node = TextNode("This is a **italics** node", TextType.TEXT)
+		with self.assertRaises(ValueError):
+			observed = split_nodes_delimiter([node], "*", TextType.ITALIC)
+		
+	def test_split_unmatched_delimiters(self):
+		node = TextNode("This is a *italics node", TextType.TEXT)
+		with self.assertRaises(ValueError):
+			observed = split_nodes_delimiter([node], "*", TextType.ITALIC)
 
 if __name__ == "__main__":
 	unittest.main()

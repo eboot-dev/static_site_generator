@@ -46,16 +46,49 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 			html_node = LeafNode("code",text_node.text)
 		case TextType.LINK:
 			if text_node.url is None:
-            	raise ValueError("Invalid URL")
-            if text_node.url == "":
-            	raise ValueError("Empty URL")
+				raise ValueError("Invalid URL")
+			if text_node.url == "":
+				raise ValueError("Empty URL")
 			html_node = LeafNode("a",text_node.text,props={"href":text_node.url})
 		case TextType.IMAGE:
 			if text_node.url is None:
-            	raise ValueError("Invalid URL")
-            if text_node.url == "":
-            	raise ValueError("Empty URL")
+				raise ValueError("Invalid URL")
+			if text_node.url == "":
+				raise ValueError("Empty URL")
 			html_node = LeafNode("img","",props={"alt":text_node.text,"src":text_node.url})
 		case _:
 			raise ValueError(f"Invalid TextType: {text_node.text_type}")
 	return html_node
+
+def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
+	"""
+		It takes a list of "old nodes", a delimiter with a matching TextNode type. It returns a new  
+		list of nodes, where any "text" type nodes in the input list are (potentially) split into 
+		multiple ones interleaved by nodes of the input-specified type. 
+		Non "text" type nodes in the `old_nodes` list are returned as they are.
+	"""
+	new_nodes: list[TextNode] = []
+	for node in old_nodes:
+		if node.text_type != TextType.TEXT:
+			new_nodes.append(node)
+			continue
+		parts = node.text.split(delimiter)
+		if (len(parts) - 1) % 2 == 1:
+			raise ValueError("Invalid Markdown: unmatched formatting delimiters")
+		cnt: int = 0
+		for part in parts:
+			if cnt % 2 == 0:
+				# even blocks are text nodes
+				if part != "":
+					new_nodes.append(TextNode(part,TextType.TEXT))
+			else:
+				# odd blocks are text_type nodes
+				if part == "":
+					raise ValueError("Invalid Markdown: empty formatted section")
+				new_nodes.append(TextNode(part,text_type))
+			cnt +=1
+
+	return new_nodes
+
+
+
