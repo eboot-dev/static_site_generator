@@ -94,10 +94,20 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
 
 	return new_nodes
 
+def markdown_to_textnodes(text: str) -> list[TextNode]:
+	# Other parsing order:
+	# BOLD (**) > ITALIC (_) > CODE (`) > IMAGE ![]() > LINK []()
+	root = [TextNode(text,TextType.TEXT)]
+	nodes = split_nodes_image(root)
+	nodes = split_nodes_link(nodes)
+	nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+	nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+	nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+	return nodes
 
 
 
-	
+
 
 
 
