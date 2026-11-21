@@ -78,17 +78,17 @@ class LeafNode(HTMLNode):
 
 
 class ParentNode(HTMLNode):
-	"""LeafNode: subclass of HTMLNode representing a leaf tag"""
+	"""ParentNode: subclass of HTMLNode representing a parent node"""
 	def __init__(self, tag: str, children: list[HTMLNode], props: dict[str,str] | None = None) -> None:
 		super().__init__(tag,None,children,props)
 
 	def to_html(self) -> str:
 		if self.tag is None:
-			raise ValueError("LeafNode.tag can't be None")
+			raise ValueError("ParentNode.tag can't be None")
 		if self.children is None:
-			raise ValueError("LeafNode.children can't be None")
+			raise ValueError("ParentNode.children can't be None")
 		if len(self.children) == 0:
-			raise ValueError("LeafNode.children can't be empty")
+			raise ValueError("ParentNode.children can't be empty")
 		
 		html_str = f"<{self.tag}{self.props_to_html()}>"
 		for child in self.children:
