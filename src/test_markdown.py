@@ -7,7 +7,11 @@ from markdown import (
 	split_nodes_delimiter,
 	split_nodes_image,
 	split_nodes_link,
-	markdown_to_textnodes
+	markdown_to_textnodes,
+	markdown_to_blocks,
+	markdown_to_html_node,
+	BlockType,
+	block_to_block_type
 )		
 
 class TestMarkdownSplitDelimiter(unittest.TestCase):
@@ -186,5 +190,188 @@ class TestMarkdownToTextNodes(unittest.TestCase):
 		]
 		self.assertListEqual(markdown_to_textnodes(text),expected )
 
+	def test_markdown_to_blocks(self):
+		md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+		blocks = markdown_to_blocks(md)
+		self.assertEqual(
+			blocks,
+			[
+				"This is **bolded** paragraph",
+				"This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+				"- This is a list\n- with items",
+			],
+		)
+
+
+		def test_markdown_to_blocks_newlines(self):
+			md = """
+This is **bolded** paragraph
+
+
+
+
+
+
+	This is another paragraph with _italic_ text and `code` here
+	This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+			blocks = markdown_to_blocks(md)
+			self.assertEqual(
+				blocks,
+				[
+					"This is **bolded** paragraph",
+					"This is another paragraph with _italic_ text and `code` here\n\tThis is the same paragraph on a new line",
+					"- This is a list\n- with items",
+				],
+			)
+
+class TestMarkdownBlockToBlockTypes(unittest.TestCase):
+	def test_block_to_block_type_paragraph(self):
+		text="""This is **bolded** paragraph
+with multiple 
+lines....
+......
+""" 
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.PARAGRAPH)
+
+	def test_block_to_block_type_ul(self):
+		text="""- line1
+- line2
+- line3
+- line3.5
+-  
+- 
+- line4
+""" 
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.UNORDERED_LIST)
+
+	def test_block_to_block_type_ol(self):
+		text="""1. line1
+2. line2
+3. line3
+4. line3.5
+5. line4
+""" 
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.ORDERED_LIST)
+
+	def test_block_to_block_type_code(self):
+		text="""```
+some code
+28912198392.line4
+```
+""" 
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.CODE)
+
+	def test_block_to_block_type_quote(self):
+		text=""">line1
+>line2
+> line3
+> line3.5
+>  
+>
+>line4
+""" 
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.QUOTE)
+
+	def test_block_to_block_type_heading1(self):
+		text="# ciao"
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.HEADING)
+
+	def test_block_to_block_type_heading2(self):
+		text="## ciao"
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.HEADING)
+
+	def test_block_to_block_type_heading5(self):
+		text="##### ciao"
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.HEADING)
+
+	def test_block_to_block_type_heading6(self):
+		text="###### ciao"
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.HEADING)
+
+	def test_block_to_block_type_heading_too_long(self):
+		text="####### ciao "
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.PARAGRAPH)
+
+	def test_block_to_block_type_bad(self):
+		text=""">line1
+-line2
+1. line3
+> line3.5
+>  
+>
+>line4
+""" 
+		self.assertEqual(block_to_block_type(text.strip()),BlockType.PARAGRAPH)
+
+class TestMarkdownToHTMLNode(unittest.TestCase):
+	def test_markdown_to_html_node(self):
+		md = """
+# heading1
+
+This is **bolded** and *italic* paragraph
+text in a p
+tag here image ![image here](http://localhost)
+
+##### heading 5 with *italic* and **bold** and [link](http://localhost)
+
+This is another paragraph with _italic_ text and `code` here
+
+```
+codeblock
+adad
+adsdas
+```
+
+Unordered List
+
+- ul1 **bold**
+- ul2 *italic*
+- ul3 `code`
+
+Ordered List
+
+1. ol1 **bold**
+2. ol2 *italic*
+3. ol3
+4. ol4 image ![image here](http://localhost)
+5. ol5
+6. ol6  [link here](http://localhost)
+7. ol7
+8. ol8
+9. ol9
+10. ol10
+
+> This is
+> a
+>quote that keeps style **bold**
+>initial spaces *italic*
+"""
+
+		node = markdown_to_html_node(md)
+		html = node.to_html()
+		expected = """<div><h1>heading1</h1><p>This is <b>bolded</b> and <i>italic</i> paragraph
+text in a p
+tag here image <img alt="image here" src="http://localhost"></img></p><h5>heading 5 with <i>italic</i> and <b>bold</b> and <a href="http://localhost">link</a></h5><p>This is another paragraph with _italic_ text and <code>code</code> here</p><pre><code>codeblock
+adad
+adsdas
+</code></pre><p>Unordered List</p><ul><li>- ul1 <b>bold</b></li><li>- ul2 <i>italic</i></li><li>- ul3 <code>code</code></li></ul><p>Ordered List</p><ol><li>ol1 <b>bold</b></li><li>ol2 <i>italic</i></li><li>ol3</li><li>ol4 image <img alt="image here" src="http://localhost"></img></li><li>ol5</li><li>ol6  <a href="http://localhost">link here</a></li><li>ol7</li><li>ol8</li><li>ol9</li><li>ol10</li></ol><blockquote><p> This is
+ a
+quote that keeps style <b>bold</b>
+initial spaces <i>italic</i></p></blockquote></div>"""
+		self.assertEqual(expected,html)
+
+	
 if __name__ == "__main__":
 	unittest.main()
