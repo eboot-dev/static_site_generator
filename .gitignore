@@ -1,3 +1,7 @@
+NOTES.txt
+.DS_Store
+public/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -221,4 +225,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-NOTES.txt
