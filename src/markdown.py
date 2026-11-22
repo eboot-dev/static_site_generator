@@ -208,7 +208,6 @@ def markdown_to_html_node(markdown: str) -> ParentNode:
 			case BlockType.UNORDERED_LIST:
 				ul_node_children = []
 				for line in block.split("\n"):
-					li_children = text_to_nodes(line)
 					li_children = text_to_nodes(line[2:])
 					ul_node_children.append(ParentNode("li",li_children))
 
