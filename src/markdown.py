@@ -199,10 +199,11 @@ def markdown_to_html_node(markdown: str) -> ParentNode:
 					)
 				)
 			case BlockType.QUOTE:
-				quote_text = "\n".join([line[1:] for line in block.split("\n")]) 
+				quote_text = "\n".join([line[1:].strip() for line in block.split("\n")]) 
 				p_children = text_to_nodes(quote_text)
-				quote_node = ParentNode("p",p_children)
-				blockquote_node = ParentNode("blockquote",[quote_node])
+				blockquote_node = ParentNode("blockquote",p_children)
+				# quote_node = ParentNode("p",p_children)
+				# blockquote_node = ParentNode("blockquote",[quote_node])
 				root.children.append(blockquote_node)
 			case BlockType.UNORDERED_LIST:
 				ul_node_children = []
